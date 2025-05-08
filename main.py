@@ -38,7 +38,7 @@ def index():
 
 def send_nightly_message():
     from dotenv import load_dotenv
-    load_dotenv(dotenv_path="/full/path/to/your/.env")  # Use your absolute path here
+    load_dotenv(dotenv_path="/home/dkoded/Development/goodnightlovebot/.env")
 
     TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
     TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
