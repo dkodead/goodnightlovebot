@@ -1,1 +1,16 @@
+ # Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 .env
+moods.db
+
+# Node.js
+node_modules/
+whatsapp_sender/node_modules/
+package-lock.json
+
+# OS-specific
+.DS_Store
+Thumbs.db

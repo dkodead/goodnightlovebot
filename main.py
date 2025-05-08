@@ -3,8 +3,9 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 from database import init_db, get_today_mood, save_mood, save_context, get_context
 from message_generator import generate_message
-from twilio.rest import Client
 import os
+import requests
+
 from dotenv import load_dotenv
 load_dotenv(dotenv_path="/home/dkoded/Development/goodnightlovebot/.env")
 
@@ -12,13 +13,10 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "defaultsecret")
 init_db()
 
-# Twilio config (from .env or Docker secrets)
-TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
-TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
-TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
+# Configuration
 WHATSAPP_TO = os.getenv("WHATSAPP_TO")
-DEFAULT_CONTEXT = os.getenv("DEFAULT_CONTEXT")
-client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+DEFAULT_CONTEXT = os.getenv("DEFAULT_CONTEXT", "")
+WHATSAPP_SENDER_URL = os.getenv("WHATSAPP_SENDER_URL", "http://localhost:3000/send")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -37,7 +35,6 @@ def index():
         context = request.form.get("context", stored_context)
         print(f"[INFO] Received mood submission: mood={mood}, note={note}, context={context}")
 
-        # Save updated inputs
         if mood:
             save_mood(today, mood, note)
         if context:
@@ -61,6 +58,18 @@ def update_context():
     current_context = get_context() or DEFAULT_CONTEXT
     return jsonify({"context": current_context})
 
+def send_whatsapp_message(message, recipient=None):
+    recipient = recipient or WHATSAPP_TO
+    try:
+        response = requests.post(WHATSAPP_SENDER_URL, json={
+            "to": f"{recipient}",
+            "message": message
+        })
+        response.raise_for_status()
+        print(f"[INFO] Message successfully sent via local WhatsApp sender to {recipient}.")
+    except requests.exceptions.RequestException as e:
+        print(f"[ERROR] Failed to send message: {e}")
+
 def gn():
     today = datetime.now().date()
     print(f"[INFO] Running nightly message task for date: {today}")
@@ -70,15 +79,17 @@ def gn():
     print(f"[INFO] Using session context: {session_context}")
     message = generate_message(mood_data, DEFAULT_CONTEXT, session_context)
     print(f"[INFO] Generated message: {message}")
-    client.messages.create(
-        body=message,
-        from_=f"whatsapp:{TWILIO_WHATSAPP_FROM}",
-        to=f"whatsapp:{WHATSAPP_TO}"
-    )
-    print("[INFO] WhatsApp message sent successfully.")
+    send_whatsapp_message(message)
+
+@app.route("/test-send")
+def test_gn():
+    print("[TEST] Running test message send...")
+    test_message = generate_message(("test", "this is a test context"), DEFAULT_CONTEXT, "Test context only.")
+    send_whatsapp_message(test_message, recipient="null@c.us")
+    return jsonify({"status": "test sent", "message": test_message})
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(gn, 'cron', hour=22, minute=0)
+scheduler.add_job(gn(), 'cron', hour=22, minute=0)
 scheduler.start()
 
 if __name__ == "__main__":
