@@ -9,14 +9,22 @@ import requests
 from dotenv import load_dotenv
 load_dotenv(dotenv_path="/home/dkoded/Development/goodnightlovebot/.env")
 
+def check_whatsapp_sender():
+    try:
+        res = requests.get(WHATSAPP_SENDER_URL.replace("/send", "/"))
+        print("[CHECK] WhatsApp sender server is up.")
+    except Exception as e:
+        print("[ERROR] WhatsApp sender server is not reachable.")
+        print(f"        {e}")
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "defaultsecret")
 init_db()
-
+check_whatsapp_sender()
 # Configuration
 WHATSAPP_TO = os.getenv("WHATSAPP_TO")
 DEFAULT_CONTEXT = os.getenv("DEFAULT_CONTEXT", "")
-WHATSAPP_SENDER_URL = os.getenv("WHATSAPP_SENDER_URL", "http://localhost:3000/send")
+WHATSAPP_SENDER_URL = "http://localhost:3000/send" #harccoding for testing
+    # os.getenv("WHATSAPP_SENDER_URL")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -88,9 +96,17 @@ def test_gn():
     send_whatsapp_message(test_message, recipient="null@c.us")
     return jsonify({"status": "test sent", "message": test_message})
 
-scheduler = BackgroundScheduler()
-scheduler.add_job(gn(), 'cron', hour=22, minute=0)
-scheduler.start()
+def dry_run_send():
+    try:
+        print("[DRY RUN] Sending dummy message to confirm sender is wired up...")
+        test_msg = "✅ WhatsApp sender is ready."
+        requests.post(WHATSAPP_SENDER_URL, json={"to": "null@c.us", "message": test_msg})
+    except Exception as e:
+        print(f"[ERROR] Dry-run send failed: {e}")
+
+# scheduler = BackgroundScheduler()
+# scheduler.add_job(gn(), 'cron', hour=22, minute=0)
+# scheduler.start()
 
 if __name__ == "__main__":
     print("[INFO] Starting Flask app on port 5000")
