@@ -37,6 +37,16 @@ def index():
     return render_template(template, mood=today_mood)
 
 def send_nightly_message():
+    from dotenv import load_dotenv
+    load_dotenv(dotenv_path="/full/path/to/your/.env")  # Use your absolute path here
+
+    TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+    TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+    TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
+    WHATSAPP_TO = os.getenv("WHATSAPP_TO")
+
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
     today = datetime.now().date()
     print(f"[INFO] Running nightly message task for date: {today}")
     mood_data = get_today_mood(today)
