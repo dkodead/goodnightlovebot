@@ -16,6 +16,7 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
 WHATSAPP_TO = os.getenv("WHATSAPP_TO")
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+DEFAULT_CONTEXT = os.getenv("DEFAULT_CONTEXT")
 
 @app.route("/", methods=["GET", "POST"])
 def index():
