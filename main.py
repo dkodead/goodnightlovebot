@@ -5,6 +5,8 @@ from database import init_db, get_today_mood, save_mood, save_context, get_conte
 from message_generator import generate_message
 from twilio.rest import Client
 import os
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="/home/dkoded/Development/goodnightlovebot/.env")
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "defaultsecret")
@@ -15,7 +17,7 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
 WHATSAPP_TO = os.getenv("WHATSAPP_TO")
-DEFAULT_CONTEXT = os.environ["DEFAULT_CONTEXT"]
+DEFAULT_CONTEXT = os.getenv("DEFAULT_CONTEXT")
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 @app.route("/", methods=["GET", "POST"])
@@ -59,7 +61,7 @@ def update_context():
     current_context = get_context() or DEFAULT_CONTEXT
     return jsonify({"context": current_context})
 
-def send_nightly_message():
+def gn():
     today = datetime.now().date()
     print(f"[INFO] Running nightly message task for date: {today}")
     mood_data = get_today_mood(today)
@@ -76,7 +78,7 @@ def send_nightly_message():
     print("[INFO] WhatsApp message sent successfully.")
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(send_nightly_message, 'cron', hour=22, minute=0)
+scheduler.add_job(gn, 'cron', hour=22, minute=0)
 scheduler.start()
 
 if __name__ == "__main__":
