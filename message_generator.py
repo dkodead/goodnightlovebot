@@ -1,14 +1,13 @@
 import requests
 
-def generate_message(mood_data):
+def generate_message(mood_data, default_context, session_context):
+    combined_context = f"{default_context}\n{session_context}".strip()
     if not mood_data:
-        prompt = (
-            "Write a short, sweet goodnight message for my girlfriend. "
-            "Make it warm, thoughtful, and comforting."
-        )
+        prompt = combined_context + "\nWrite a short, sweet goodnight message for my girlfriend."
     else:
         mood, note = mood_data
         prompt = (
+            combined_context + "\n"
             f"Today I felt {mood}. I want to tell her: '{note}'. "
             "Please generate a heartfelt, short goodnight message based on this."
         )
@@ -26,4 +25,4 @@ def generate_message(mood_data):
         return message
     except Exception as e:
         print(f"[ERROR] Failed to get response from Mistral: {e}")
-        return "Goodnight my love ❤️ I hope today was gentle on your heart. Sleep peacefully."
+        return "Goodnight my love ❤️ I hope today was gentle on your heart. Sweet dreams schatje."
