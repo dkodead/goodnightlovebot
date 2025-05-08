@@ -11,6 +11,18 @@ def init_db():
             note TEXT
         )
     """)
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT
+        )
+    """)
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS context_log (
+            timestamp TEXT,
+            context TEXT
+        )
+    """)
     conn.commit()
     conn.close()
     print("[INFO] Database initialized.")
@@ -34,18 +46,24 @@ def get_today_mood(date):
     print(f"[INFO] Fetched mood result: {result}")
     return result
 
-# === message_generator.py ===
-def generate_message(mood_data):
-    print(f"[INFO] Generating message for mood data: {mood_data}")
-    if not mood_data:
-        return "Goodnight my love ❤️ I hope today was gentle on your heart. Sleep peacefully."
+def save_context(context):
+    from datetime import datetime
+    print(f"[INFO] Saving context: {context}")
+    conn = sqlite3.connect("moods.db")
+    c = conn.cursor()
+    c.execute("REPLACE INTO settings (key, value) VALUES (?, ?)", ("context", context))
+    c.execute("INSERT INTO context_log (timestamp, context) VALUES (?, ?)", (datetime.now().isoformat(), context))
+    conn.commit()
+    conn.close()
+    print("[INFO] Context saved and logged.")
 
-    mood, note = mood_data
-    if mood == "sad":
-        return "I know today was hard 😔 but I'm here with you in spirit. Sleep easy, my heart."
-    elif mood == "ok":
-        return "Another day done. I'm proud of you, babe. Rest up 😌💤"
-    elif mood == "happy":
-        return "You're glowing brighter than the moon tonight ✨ Sweet dreams my love 💋"
-    else:
-        return f"Goodnight sweetheart ❤️ Today you felt: {mood}. I’m thinking of you always."
+def get_context():
+    print("[INFO] Retrieving stored context...")
+    conn = sqlite3.connect("moods.db")
+    c = conn.cursor()
+    c.execute("SELECT value FROM settings WHERE key = ?", ("context",))
+    result = c.fetchone()
+    conn.close()
+    context_value = result[0] if result else None
+    print(f"[INFO] Stored context: {context_value}")
+    return context_value

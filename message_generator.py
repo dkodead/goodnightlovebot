@@ -1,6 +1,9 @@
 import requests
+import os
 
 def generate_message(mood_data, default_context, session_context):
+    from dotenv import load_dotenv
+    load_dotenv(dotenv_path="/home/dkoded/Development/goodnightlovebot/.env")
     combined_context = f"{default_context}\n{session_context}".strip()
     if not mood_data:
         prompt = combined_context + "\nWrite a short, sweet goodnight message for my girlfriend."
