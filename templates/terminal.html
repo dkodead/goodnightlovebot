@@ -1,0 +1,36 @@
+"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Terminal Mood Input</title>
+    <style>
+        body { background-color: black; color: lime; font-family: monospace; padding: 20px; }
+        textarea, input, select { background: black; color: lime; border: none; }
+    </style>
+</head>
+<body>
+<pre>
+╔════════════════════════════════════╗
+║     WELCOME TO LOVEBOT TERMINAL    ║
+╚════════════════════════════════════╝
+</pre>
+<form method="POST">
+> How do you feel today? [happy | ok | sad]<br>
+<select name="mood">
+    <option value="happy">happy</option>
+    <option value="ok">ok</option>
+    <option value="sad">sad</option>
+</select><br><br>
+> Anything you want her to know?<br>
+<textarea name="note"></textarea><br><br>
+> <input type="submit" value="Send">
+</form>
+{% if mood %}
+<pre>
+[ Mood saved: {{ mood[0] }} ]
+[ Note: {{ mood[1] }} ]
+</pre>
+{% endif %}
+</body>
+</html>
+"""

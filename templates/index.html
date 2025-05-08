@@ -1,0 +1,23 @@
+"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mood Input</title>
+</head>
+<body>
+    <h1>How are you feeling today?</h1>
+    <form method="POST">
+        <select name="mood">
+            <option value="happy">😊 Happy</option>
+            <option value="ok">😐 Okay</option>
+            <option value="sad">😔 Sad</option>
+        </select><br><br>
+        <textarea name="note" placeholder="Optional: add more context"></textarea><br><br>
+        <input type="submit" value="Save Mood">
+    </form>
+    {% if mood %}
+        <p><strong>Today's Mood:</strong> {{ mood[0] }} - {{ mood[1] }}</p>
+    {% endif %}
+</body>
+</html>
+"""

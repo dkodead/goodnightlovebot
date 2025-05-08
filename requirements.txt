@@ -1,0 +1,5 @@
+# === requirements.txt ===
+Flask
+APScheduler
+twilio
+python-dotenv
