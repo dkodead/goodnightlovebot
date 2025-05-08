@@ -29,7 +29,4 @@ This is a self-hosted Flask web app (Docker-ready) that asks *you* how you're fe
 
 ## 🚀 Getting Started
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/dkodead/goodnightlovebot.git
-cd goodnightlovebot
+TBC
